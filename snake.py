@@ -1,5 +1,4 @@
 import pygame
-import time
 import random
 
 # Inicialización de pygame
@@ -7,9 +6,9 @@ pygame.init()
 
 # Definir colores
 blanco = (255, 255, 255)
-negro = (0, 0, 0)
+fondo = (34, 70, 34)  # Verde oscuro
 rojo = (213, 50, 80)
-verde = (0, 255, 0)
+verde_claro = (144, 238, 144)  # Verde claro para la serpiente
 azul = (50, 153, 213)
 
 # Dimensiones de la pantalla
@@ -26,13 +25,18 @@ velocidad = 15
 
 clock = pygame.time.Clock()
 
-# Fuente para mostrar la puntuación
-fuente = pygame.font.SysFont("bahnschrift", 25)
+
+# Fuente para mostrar la puntuación y mensajes
+fuente = pygame.font.SysFont("consolas", 15)
+fuente_mensaje = pygame.font.SysFont("consolas", 15, bold=True)
 
 
 def mostrar_puntuacion(puntuacion):
     texto = fuente.render("Puntuación: " + str(puntuacion), True, blanco)
-    ventana.blit(texto, [10, 10])
+    # Mostrar la puntuación en la esquina inferior izquierda, dejando margen
+    texto_rect = texto.get_rect()
+    texto_rect.topleft = (10, alto - texto_rect.height - 10)
+    ventana.blit(texto, texto_rect)
 
 
 def juego():
@@ -54,10 +58,12 @@ def juego():
 
     while not juego_terminado:
         while juego_cerrado:
-            ventana.fill(negro)
-            mensaje = fuente.render(
+            ventana.fill(fondo)
+            mensaje = fuente_mensaje.render(
                 "¡Perdiste! Presiona C para continuar o Q para salir", True, rojo)
-            ventana.blit(mensaje, [ancho / 6, alto / 3])
+            # Centrar el mensaje horizontalmente
+            mensaje_rect = mensaje.get_rect(center=(ancho // 2, alto // 3))
+            ventana.blit(mensaje, mensaje_rect)
             mostrar_puntuacion(longitud_serpiente - 1)
             pygame.display.update()
 
@@ -100,8 +106,8 @@ def juego():
         x += dx
         y += dy
 
-        ventana.fill(negro)
-        pygame.draw.rect(ventana, verde, [
+        ventana.fill(fondo)
+        pygame.draw.rect(ventana, rojo, [
                          comida_x, comida_y, tamanio_celda, tamanio_celda])
 
         cabeza = []
@@ -118,7 +124,7 @@ def juego():
 
         for segmento in cuerpo_serpiente:
             pygame.draw.rect(
-                ventana, azul, [segmento[0], segmento[1], tamanio_celda, tamanio_celda])
+                ventana, verde_claro, [segmento[0], segmento[1], tamanio_celda, tamanio_celda])
 
         mostrar_puntuacion(longitud_serpiente - 1)
         pygame.display.update()
