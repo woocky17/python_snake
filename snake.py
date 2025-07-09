@@ -1,8 +1,10 @@
 import pygame
 import random
+import os
 
 # Inicialización de pygame
 pygame.init()
+
 
 # Definir colores
 blanco = (255, 255, 255)
@@ -11,6 +13,10 @@ rojo = (213, 50, 80)
 verde_claro = (144, 238, 144)  # Verde claro para la serpiente
 azul = (50, 153, 213)
 
+# Tamaño de celda para texturas
+TILE_SIZE = 10
+
+
 # Dimensiones de la pantalla
 ancho = 600
 alto = 400
@@ -18,6 +24,19 @@ alto = 400
 # Configurar la ventana
 ventana = pygame.display.set_mode((ancho, alto))
 pygame.display.set_caption("Juego de la Serpiente")
+
+# Crear "texturas" de colores planos
+background_texture = pygame.Surface((TILE_SIZE, TILE_SIZE))
+background_texture.fill(fondo)
+
+snake_texture = pygame.Surface((TILE_SIZE, TILE_SIZE), pygame.SRCALPHA)
+snake_texture.fill(verde_claro)
+
+
+# Escalar la manzana para que ocupe más que una celda (por ejemplo, 1.5x)
+APPLE_SIZE = int(TILE_SIZE * 1.5)
+apple_texture = pygame.image.load("assets/apple.png").convert_alpha()
+apple_texture = pygame.transform.scale(apple_texture, (APPLE_SIZE, APPLE_SIZE))
 
 # Configuración de la serpiente
 tamanio_celda = 10
@@ -106,9 +125,15 @@ def juego():
         x += dx
         y += dy
 
-        ventana.fill(fondo)
-        pygame.draw.rect(ventana, rojo, [
-                         comida_x, comida_y, tamanio_celda, tamanio_celda])
+        # Dibujar fondo con "textura"
+        for i in range(0, ancho, TILE_SIZE):
+            for j in range(0, alto, TILE_SIZE):
+                ventana.blit(background_texture, (i, j))
+
+        # Dibujar la manzana con textura, centrada en la celda
+        apple_rect = apple_texture.get_rect(
+            center=(comida_x + TILE_SIZE // 2, comida_y + TILE_SIZE // 2))
+        ventana.blit(apple_texture, apple_rect.topleft)
 
         cabeza = []
         cabeza.append(x)
@@ -123,8 +148,7 @@ def juego():
                 juego_cerrado = True
 
         for segmento in cuerpo_serpiente:
-            pygame.draw.rect(
-                ventana, verde_claro, [segmento[0], segmento[1], tamanio_celda, tamanio_celda])
+            ventana.blit(snake_texture, (segmento[0], segmento[1]))
 
         mostrar_puntuacion(longitud_serpiente - 1)
         pygame.display.update()
